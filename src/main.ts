@@ -7,7 +7,9 @@ async function run(): Promise<void> {
     const archiverPath: string | null = core.getInput('archiver_path')
     const derivedDataPath: string | null = core.getInput('derived_data_path')
 
-    core.debug(`bloatyPath: ${bloatyPath}`)
+    core.debug(
+      `bloatyPath: ${bloatyPath} derivedDataPath: ${derivedDataPath} archiverPath: ${archiverPath}`
+    )
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }

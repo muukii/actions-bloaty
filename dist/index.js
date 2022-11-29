@@ -46,7 +46,7 @@ function run() {
             const bloatyPath = core.getInput('bloaty_path', { required: true });
             const archiverPath = core.getInput('archiver_path');
             const derivedDataPath = core.getInput('derived_data_path');
-            core.debug(`bloatyPath: ${bloatyPath}`);
+            core.debug(`bloatyPath: ${bloatyPath} derivedDataPath: ${derivedDataPath} archiverPath: ${archiverPath}`);
         }
         catch (error) {
             if (error instanceof Error)
