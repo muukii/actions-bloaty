@@ -136,13 +136,11 @@ export default async (
 
       const regex = new RegExp(filter ?? '.*')
 
-      console.log(
-        await renderMarkdown(
-          apps.concat(modules).filter(e => {
-            return regex.test(e.name())
-          }),
-          externalArguments
-        )
+      return await renderMarkdown(
+        apps.concat(modules).filter(e => {
+          return regex.test(e.name())
+        }),
+        externalArguments
       )
     }
     case 'xcarchive':
@@ -198,7 +196,7 @@ export default async (
 
         // console.log(targets.map((e) => e.name()));
 
-        console.log(await renderMarkdown(targets, externalArguments))
+        return await renderMarkdown(targets, externalArguments)
       }
 
       break

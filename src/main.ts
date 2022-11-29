@@ -7,9 +7,27 @@ async function run(): Promise<void> {
     const archiverPath: string | null = core.getInput('archiver_path')
     const derivedDataPath: string | null = core.getInput('derived_data_path')
 
-    core.debug(
+    if (archiverPath === null && derivedDataPath === null) {
+      throw new Error(
+        'You must specify either archiver_path or derived_data_path'
+      )
+    }
+
+    core.info(
       `bloatyPath: ${bloatyPath} derivedDataPath: ${derivedDataPath} archiverPath: ${archiverPath}`
     )
+
+    const mode = archiverPath ? 'xcarchive' : 'derivedData'
+
+    const result = await bloaty(
+      bloatyPath,
+      archiverPath ?? derivedDataPath ?? '',
+      mode,
+      undefined,
+      undefined
+    )
+
+    core.info(result)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
