@@ -101,7 +101,7 @@ const stripBitcode = (path) => __awaiter(void 0, void 0, void 0, function* () {
     yield exec.exec(`cd ${newPath}; find . -type f -perm +111 -print | xargs -I {} sh -c 'xcrun bitcode_strip -r {} -o {}'`);
     return newPath;
 });
-exports["default"] = (bloatyPath, workingDirectory, mode = 'derivedData', filter, externalArguments = '') => __awaiter(void 0, void 0, void 0, function* () {
+exports["default"] = (bloatyPath, workingDirectory, mode = 'derivedData', filter, externalArguments = '', info) => __awaiter(void 0, void 0, void 0, function* () {
     switch (mode) {
         case 'derivedData': {
             const modules = [];
@@ -117,6 +117,9 @@ exports["default"] = (bloatyPath, workingDirectory, mode = 'derivedData', filter
                             dSYMPath: dSYMDirPath
                         }));
                     }
+                    else {
+                        info(`dSYM not found: ${dSYMDirPath}`);
+                    }
                 });
             }
             const apps = [];
@@ -131,6 +134,9 @@ exports["default"] = (bloatyPath, workingDirectory, mode = 'derivedData', filter
                             modulePath: file,
                             dSYMPath: dSYMDirPath
                         }));
+                    }
+                    else {
+                        info(`dSYM not found: ${dSYMDirPath}`);
                     }
                 });
             }
@@ -159,6 +165,9 @@ exports["default"] = (bloatyPath, workingDirectory, mode = 'derivedData', filter
                         modulePath: file,
                         dSYMPath: dSYMDirPath
                     }));
+                }
+                else {
+                    info(`dSYM not found: ${dSYMDirPath}`);
                 }
             });
             const regex = new RegExp(filter !== null && filter !== void 0 ? filter : '.*');
@@ -230,7 +239,9 @@ function run() {
             core.info(`bloatyPath: ${bloatyPath} derivedDataPath: ${derivedDataPath} archiverPath: ${archiverPath}`);
             const mode = archiverPath ? 'xcarchive' : 'derivedData';
             core.info(mode);
-            const result = yield (0, bloaty_1.default)(bloatyPath, (_a = archiverPath !== null && archiverPath !== void 0 ? archiverPath : derivedDataPath) !== null && _a !== void 0 ? _a : '', mode, undefined, undefined);
+            const result = yield (0, bloaty_1.default)(bloatyPath, (_a = archiverPath !== null && archiverPath !== void 0 ? archiverPath : derivedDataPath) !== null && _a !== void 0 ? _a : '', mode, undefined, undefined, log => {
+                core.info(log);
+            });
             core.info(result);
         }
         catch (error) {

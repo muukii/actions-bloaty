@@ -88,7 +88,8 @@ export default async (
   workingDirectory: string,
   mode: 'derivedData' | 'xcarchive' = 'derivedData',
   filter: string | undefined,
-  externalArguments: string = ''
+  externalArguments: string = '',
+  info: (log: string) => void
 ) => {
   switch (mode) {
     case 'derivedData': {
@@ -109,6 +110,8 @@ export default async (
                 dSYMPath: dSYMDirPath
               })
             )
+          } else {
+            info(`dSYM not found: ${dSYMDirPath}`)
           }
         })
       }
@@ -130,6 +133,8 @@ export default async (
                 dSYMPath: dSYMDirPath
               })
             )
+          } else {
+            info(`dSYM not found: ${dSYMDirPath}`)
           }
         })
       }
@@ -184,6 +189,8 @@ export default async (
               dSYMPath: dSYMDirPath
             })
           )
+        } else {
+          info(`dSYM not found: ${dSYMDirPath}`)
         }
       })
 

@@ -26,7 +26,10 @@ async function run(): Promise<void> {
       archiverPath ?? derivedDataPath ?? '',
       mode,
       undefined,
-      undefined
+      undefined,
+      log => {
+        core.info(log)
+      }
     )
 
     core.info(result)
