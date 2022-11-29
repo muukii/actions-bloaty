@@ -1,11 +1,16 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Bloaty'
+description: 'Make binary reports using Bloaty'
+author: 'Muukii'
 inputs:
-  milliseconds: # change this
+  bloaty_path:
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+    description: 'path to bloaty executable binary'
+  xcarchive_path:
+    required: false
+    description: ''
+  derived_data_path:
+    required: false
+    description: ''
 runs:
   using: 'node16'
   main: 'dist/index.js'

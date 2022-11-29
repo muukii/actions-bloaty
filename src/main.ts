@@ -1,16 +1,13 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import bloaty from './bloaty'
 
 async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
+    const bloatyPath: string = core.getInput('bloaty_path', {required: true})
+    const archiverPath: string | null = core.getInput('archiver_path')
+    const derivedDataPath: string | null = core.getInput('derived_data_path')
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
-
-    core.setOutput('time', new Date().toTimeString())
+    core.debug(`bloatyPath: ${bloatyPath}`)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
