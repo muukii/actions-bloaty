@@ -102,6 +102,8 @@ export default async (
 ) => {
   switch (mode.type) {
     case 'derivedData': {
+      info('mode: derivedData')
+
       const modules: ReturnType<typeof createModule>[] = []
       {
         const globber = await glob.create(
@@ -148,6 +150,8 @@ export default async (
         })
       }
 
+      info(`modules: ${modules.length}, apps: ${apps.length}`)
+
       const regex = new RegExp(filter ?? '.*')
 
       return await renderMarkdown(
@@ -158,6 +162,8 @@ export default async (
       )
     }
     case 'xcarchive': {
+      info('mode: xcarchive')
+
       const strippedPath = await stripBitcode(mode.xcarchivePath)
 
       const app = fs.readdirSync(

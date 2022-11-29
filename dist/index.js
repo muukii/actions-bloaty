@@ -104,6 +104,7 @@ const stripBitcode = (path) => __awaiter(void 0, void 0, void 0, function* () {
 exports["default"] = (bloatyPath, mode, filter, externalArguments = '', info) => __awaiter(void 0, void 0, void 0, function* () {
     switch (mode.type) {
         case 'derivedData': {
+            info('mode: derivedData');
             const modules = [];
             {
                 const globber = yield glob.create(path_1.default.join(mode.derivedDataPath, '**/*.framework'), {});
@@ -140,12 +141,14 @@ exports["default"] = (bloatyPath, mode, filter, externalArguments = '', info) =>
                     }
                 });
             }
+            info(`modules: ${modules.length}, apps: ${apps.length}`);
             const regex = new RegExp(filter !== null && filter !== void 0 ? filter : '.*');
             return yield renderMarkdown(apps.concat(modules).filter(e => {
                 return regex.test(e.name());
             }), externalArguments);
         }
         case 'xcarchive': {
+            info('mode: xcarchive');
             const strippedPath = yield stripBitcode(mode.xcarchivePath);
             const app = fs_1.default.readdirSync(path_1.default.join(strippedPath, 'Products/Applications'))[0];
             const appModule = createModule({
