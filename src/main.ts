@@ -19,6 +19,8 @@ async function run(): Promise<void> {
 
     const mode = archiverPath ? 'xcarchive' : 'derivedData'
 
+    core.info(mode)
+
     const result = await bloaty(
       bloatyPath,
       archiverPath ?? derivedDataPath ?? '',

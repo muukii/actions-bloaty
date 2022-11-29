@@ -139,37 +139,35 @@ exports["default"] = (bloatyPath, workingDirectory, mode = 'derivedData', filter
                 return regex.test(e.name());
             }), externalArguments);
         }
-        case 'xcarchive':
-            {
-                const strippedPath = yield stripBitcode(workingDirectory);
-                const app = fs_1.default.readdirSync(path_1.default.join(strippedPath, 'Products/Applications'))[0];
-                const appModule = createModule({
-                    bloatyPath: bloatyPath,
-                    modulePath: path_1.default.join(strippedPath, 'Products/Applications', app),
-                    dSYMPath: path_1.default.join(strippedPath, 'dSYMs', app + '.dSYM')
-                });
-                const modules = [];
-                const globber = yield glob.create(path_1.default.join(strippedPath, 'Products/Applications', app, '/Frameworks/*.framework'), {});
-                const files = yield globber.glob();
-                files.forEach(file => {
-                    const frameworkName = path_1.default.basename(file);
-                    const dSYMDirPath = path_1.default.join(strippedPath, `dSYMs/${frameworkName}.dSYM`);
-                    if (fs_1.default.existsSync(dSYMDirPath)) {
-                        modules.push(createModule({
-                            bloatyPath: bloatyPath,
-                            modulePath: file,
-                            dSYMPath: dSYMDirPath
-                        }));
-                    }
-                });
-                const regex = new RegExp(filter !== null && filter !== void 0 ? filter : '.*');
-                const targets = [appModule].concat(modules).filter(e => {
-                    return regex.test(e.name());
-                });
-                // console.log(targets.map((e) => e.name()));
-                return yield renderMarkdown(targets, externalArguments);
-            }
-            break;
+        case 'xcarchive': {
+            const strippedPath = yield stripBitcode(workingDirectory);
+            const app = fs_1.default.readdirSync(path_1.default.join(strippedPath, 'Products/Applications'))[0];
+            const appModule = createModule({
+                bloatyPath: bloatyPath,
+                modulePath: path_1.default.join(strippedPath, 'Products/Applications', app),
+                dSYMPath: path_1.default.join(strippedPath, 'dSYMs', app + '.dSYM')
+            });
+            const modules = [];
+            const globber = yield glob.create(path_1.default.join(strippedPath, 'Products/Applications', app, '/Frameworks/*.framework'), {});
+            const files = yield globber.glob();
+            files.forEach(file => {
+                const frameworkName = path_1.default.basename(file);
+                const dSYMDirPath = path_1.default.join(strippedPath, `dSYMs/${frameworkName}.dSYM`);
+                if (fs_1.default.existsSync(dSYMDirPath)) {
+                    modules.push(createModule({
+                        bloatyPath: bloatyPath,
+                        modulePath: file,
+                        dSYMPath: dSYMDirPath
+                    }));
+                }
+            });
+            const regex = new RegExp(filter !== null && filter !== void 0 ? filter : '.*');
+            const targets = [appModule].concat(modules).filter(e => {
+                return regex.test(e.name());
+            });
+            // console.log(targets.map((e) => e.name()));
+            return yield renderMarkdown(targets, externalArguments);
+        }
     }
 });
 
@@ -231,6 +229,7 @@ function run() {
             }
             core.info(`bloatyPath: ${bloatyPath} derivedDataPath: ${derivedDataPath} archiverPath: ${archiverPath}`);
             const mode = archiverPath ? 'xcarchive' : 'derivedData';
+            core.info(mode);
             const result = yield (0, bloaty_1.default)(bloatyPath, (_a = archiverPath !== null && archiverPath !== void 0 ? archiverPath : derivedDataPath) !== null && _a !== void 0 ? _a : '', mode, undefined, undefined);
             core.info(result);
         }

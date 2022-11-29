@@ -143,62 +143,59 @@ export default async (
         externalArguments
       )
     }
-    case 'xcarchive':
-      {
-        const strippedPath = await stripBitcode(workingDirectory)
+    case 'xcarchive': {
+      const strippedPath = await stripBitcode(workingDirectory)
 
-        const app = fs.readdirSync(
-          path.join(strippedPath, 'Products/Applications')
-        )[0]
+      const app = fs.readdirSync(
+        path.join(strippedPath, 'Products/Applications')
+      )[0]
 
-        const appModule = createModule({
-          bloatyPath: bloatyPath,
-          modulePath: path.join(strippedPath, 'Products/Applications', app),
-          dSYMPath: path.join(strippedPath, 'dSYMs', app + '.dSYM')
-        })
+      const appModule = createModule({
+        bloatyPath: bloatyPath,
+        modulePath: path.join(strippedPath, 'Products/Applications', app),
+        dSYMPath: path.join(strippedPath, 'dSYMs', app + '.dSYM')
+      })
 
-        const modules: ReturnType<typeof createModule>[] = []
+      const modules: ReturnType<typeof createModule>[] = []
 
-        const globber = await glob.create(
-          path.join(
-            strippedPath,
-            'Products/Applications',
-            app,
-            '/Frameworks/*.framework'
-          ),
-          {}
+      const globber = await glob.create(
+        path.join(
+          strippedPath,
+          'Products/Applications',
+          app,
+          '/Frameworks/*.framework'
+        ),
+        {}
+      )
+      const files = await globber.glob()
+
+      files.forEach(file => {
+        const frameworkName = path.basename(file)
+
+        const dSYMDirPath = path.join(
+          strippedPath,
+          `dSYMs/${frameworkName}.dSYM`
         )
-        const files = await globber.glob()
-
-        files.forEach(file => {
-          const frameworkName = path.basename(file)
-
-          const dSYMDirPath = path.join(
-            strippedPath,
-            `dSYMs/${frameworkName}.dSYM`
+        if (fs.existsSync(dSYMDirPath)) {
+          modules.push(
+            createModule({
+              bloatyPath: bloatyPath,
+              modulePath: file,
+              dSYMPath: dSYMDirPath
+            })
           )
-          if (fs.existsSync(dSYMDirPath)) {
-            modules.push(
-              createModule({
-                bloatyPath: bloatyPath,
-                modulePath: file,
-                dSYMPath: dSYMDirPath
-              })
-            )
-          }
-        })
+        }
+      })
 
-        const regex = new RegExp(filter ?? '.*')
+      const regex = new RegExp(filter ?? '.*')
 
-        const targets = [appModule].concat(modules).filter(e => {
-          return regex.test(e.name())
-        })
+      const targets = [appModule].concat(modules).filter(e => {
+        return regex.test(e.name())
+      })
 
-        // console.log(targets.map((e) => e.name()));
+      // console.log(targets.map((e) => e.name()));
 
-        return await renderMarkdown(targets, externalArguments)
-      }
-
-      break
+      return await renderMarkdown(targets, externalArguments)
+    }
   }
 }
