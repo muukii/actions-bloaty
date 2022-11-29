@@ -134,7 +134,12 @@ export default async (
           {}
         )
 
-        info(`Find apps binary: ${globber.getSearchPaths()}`)
+        info(
+          `Find apps binary: ${globber.getSearchPaths()}, pattern: ${path.join(
+            mode.derivedDataPath,
+            '**/*.app'
+          )}`
+        )
 
         const files = await globber.glob()
         files.forEach(file => {
