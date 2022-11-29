@@ -101,12 +101,12 @@ const stripBitcode = (path) => __awaiter(void 0, void 0, void 0, function* () {
     yield exec.exec(`cd ${newPath}; find . -type f -perm +111 -print | xargs -I {} sh -c 'xcrun bitcode_strip -r {} -o {}'`);
     return newPath;
 });
-exports["default"] = (bloatyPath, workingDirectory, mode = 'derivedData', filter, externalArguments = '', info) => __awaiter(void 0, void 0, void 0, function* () {
-    switch (mode) {
+exports["default"] = (bloatyPath, mode, filter, externalArguments = '', info) => __awaiter(void 0, void 0, void 0, function* () {
+    switch (mode.type) {
         case 'derivedData': {
             const modules = [];
             {
-                const globber = yield glob.create(path_1.default.join(workingDirectory, '*.framework'), {});
+                const globber = yield glob.create(path_1.default.join(mode.derivedDataPath, '**/*.framework'), {});
                 const files = yield globber.glob();
                 files.forEach(file => {
                     const dSYMDirPath = file + '.dSYM';
@@ -124,7 +124,7 @@ exports["default"] = (bloatyPath, workingDirectory, mode = 'derivedData', filter
             }
             const apps = [];
             {
-                const globber = yield glob.create(path_1.default.join(workingDirectory, '*.app'), {});
+                const globber = yield glob.create(path_1.default.join(mode.derivedDataPath, '**/*.app'), {});
                 const files = yield globber.glob();
                 files.forEach(file => {
                     const dSYMDirPath = file + '.dSYM';
@@ -146,7 +146,7 @@ exports["default"] = (bloatyPath, workingDirectory, mode = 'derivedData', filter
             }), externalArguments);
         }
         case 'xcarchive': {
-            const strippedPath = yield stripBitcode(workingDirectory);
+            const strippedPath = yield stripBitcode(mode.xcarchivePath);
             const app = fs_1.default.readdirSync(path_1.default.join(strippedPath, 'Products/Applications'))[0];
             const appModule = createModule({
                 bloatyPath: bloatyPath,
@@ -227,22 +227,33 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const bloaty_1 = __importDefault(__nccwpck_require__(4283));
 function run() {
-    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const bloatyPath = core.getInput('bloaty_path', { required: true });
-            const archiverPath = core.getInput('archiver_path');
+            const xcarchivePath = core.getInput('xcarchive_path');
             const derivedDataPath = core.getInput('derived_data_path');
-            if (archiverPath === null && derivedDataPath === null) {
+            if (xcarchivePath === null && derivedDataPath === null) {
                 throw new Error('You must specify either archiver_path or derived_data_path');
             }
-            core.info(`bloatyPath: ${bloatyPath} derivedDataPath: ${derivedDataPath} archiverPath: ${archiverPath}`);
-            const mode = archiverPath ? 'xcarchive' : 'derivedData';
-            core.info(mode);
-            const result = yield (0, bloaty_1.default)(bloatyPath, (_a = archiverPath !== null && archiverPath !== void 0 ? archiverPath : derivedDataPath) !== null && _a !== void 0 ? _a : '', mode, undefined, undefined, log => {
-                core.info(log);
-            });
-            core.info(result);
+            core.info(`bloatyPath: ${bloatyPath} derivedDataPath: ${derivedDataPath} xcarchivePath: ${xcarchivePath}`);
+            if (xcarchivePath) {
+                const result = yield (0, bloaty_1.default)(bloatyPath, {
+                    type: 'xcarchive',
+                    xcarchivePath: xcarchivePath
+                }, undefined, undefined, log => {
+                    core.info(log);
+                });
+                core.info(result);
+            }
+            if (derivedDataPath) {
+                const result = yield (0, bloaty_1.default)(bloatyPath, {
+                    type: 'derivedData',
+                    derivedDataPath: derivedDataPath
+                }, undefined, undefined, log => {
+                    core.info(log);
+                });
+                core.info(result);
+            }
         }
         catch (error) {
             if (error instanceof Error)

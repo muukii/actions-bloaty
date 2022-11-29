@@ -83,20 +83,29 @@ const stripBitcode = async (path: string) => {
   return newPath
 }
 
+type DerivedDataMode = {
+  type: 'derivedData'
+  derivedDataPath: string
+}
+
+type XcarchiveMode = {
+  type: 'xcarchive'
+  xcarchivePath: string
+}
+
 export default async (
   bloatyPath: string,
-  workingDirectory: string,
-  mode: 'derivedData' | 'xcarchive' = 'derivedData',
+  mode: DerivedDataMode | XcarchiveMode,
   filter: string | undefined,
   externalArguments: string = '',
   info: (log: string) => void
 ) => {
-  switch (mode) {
+  switch (mode.type) {
     case 'derivedData': {
       const modules: ReturnType<typeof createModule>[] = []
       {
         const globber = await glob.create(
-          path.join(workingDirectory, '*.framework'),
+          path.join(mode.derivedDataPath, '**/*.framework'),
           {}
         )
         const files = await globber.glob()
@@ -119,7 +128,7 @@ export default async (
       const apps: ReturnType<typeof createModule>[] = []
       {
         const globber = await glob.create(
-          path.join(workingDirectory, '*.app'),
+          path.join(mode.derivedDataPath, '**/*.app'),
           {}
         )
         const files = await globber.glob()
@@ -149,7 +158,7 @@ export default async (
       )
     }
     case 'xcarchive': {
-      const strippedPath = await stripBitcode(workingDirectory)
+      const strippedPath = await stripBitcode(mode.xcarchivePath)
 
       const app = fs.readdirSync(
         path.join(strippedPath, 'Products/Applications')

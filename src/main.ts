@@ -4,35 +4,52 @@ import bloaty from './bloaty'
 async function run(): Promise<void> {
   try {
     const bloatyPath: string = core.getInput('bloaty_path', {required: true})
-    const archiverPath: string | null = core.getInput('archiver_path')
+    const xcarchivePath: string | null = core.getInput('xcarchive_path')
     const derivedDataPath: string | null = core.getInput('derived_data_path')
 
-    if (archiverPath === null && derivedDataPath === null) {
+    if (xcarchivePath === null && derivedDataPath === null) {
       throw new Error(
         'You must specify either archiver_path or derived_data_path'
       )
     }
 
     core.info(
-      `bloatyPath: ${bloatyPath} derivedDataPath: ${derivedDataPath} archiverPath: ${archiverPath}`
+      `bloatyPath: ${bloatyPath} derivedDataPath: ${derivedDataPath} xcarchivePath: ${xcarchivePath}`
     )
 
-    const mode = archiverPath ? 'xcarchive' : 'derivedData'
+    if (xcarchivePath) {
+      const result = await bloaty(
+        bloatyPath,
+        {
+          type: 'xcarchive',
+          xcarchivePath: xcarchivePath
+        },
+        undefined,
+        undefined,
+        log => {
+          core.info(log)
+        }
+      )
 
-    core.info(mode)
+      core.info(result)
+    }
 
-    const result = await bloaty(
-      bloatyPath,
-      archiverPath ?? derivedDataPath ?? '',
-      mode,
-      undefined,
-      undefined,
-      log => {
-        core.info(log)
-      }
-    )
+    if (derivedDataPath) {
+      const result = await bloaty(
+        bloatyPath,
+        {
+          type: 'derivedData',
+          derivedDataPath: derivedDataPath
+        },
+        undefined,
+        undefined,
+        log => {
+          core.info(log)
+        }
+      )
 
-    core.info(result)
+      core.info(result)
+    }
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
