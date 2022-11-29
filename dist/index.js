@@ -126,6 +126,7 @@ exports["default"] = (bloatyPath, mode, filter, externalArguments = '', info) =>
             const apps = [];
             {
                 const globber = yield glob.create(path_1.default.join(mode.derivedDataPath, '**/*.app'), {});
+                info(`Find apps binary: ${globber.getSearchPaths()}`);
                 const files = yield globber.glob();
                 files.forEach(file => {
                     const dSYMDirPath = file + '.dSYM';

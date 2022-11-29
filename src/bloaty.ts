@@ -133,6 +133,9 @@ export default async (
           path.join(mode.derivedDataPath, '**/*.app'),
           {}
         )
+
+        info(`Find apps binary: ${globber.getSearchPaths()}`)
+
         const files = await globber.glob()
         files.forEach(file => {
           const dSYMDirPath = file + '.dSYM'
