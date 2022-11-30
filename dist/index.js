@@ -125,7 +125,12 @@ exports["default"] = (bloatyPath, mode, filter, externalArguments = '', info) =>
             }
             const apps = [];
             {
-                const globber = yield glob.create(path_1.default.join(mode.derivedDataPath, '**/*.app'), {});
+                const patterns = [
+                    '**',
+                    '**/*.app',
+                    path_1.default.join(mode.derivedDataPath, '**/*.app')
+                ];
+                const globber = yield glob.create(patterns.join('\n'), {});
                 info(`Find apps binary: ${globber.getSearchPaths()}, pattern: ${path_1.default.join(mode.derivedDataPath, '**/*.app')}`);
                 const files = yield globber.glob();
                 files.forEach(file => {
