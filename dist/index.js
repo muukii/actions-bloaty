@@ -251,6 +251,7 @@ function run() {
                     core.info(log);
                 });
                 core.info(result);
+                yield core.markdownSummary.addRaw(result).write();
             }
             if (derivedDataPath) {
                 const result = yield (0, bloaty_1.default)(bloatyPath, {
@@ -260,6 +261,7 @@ function run() {
                     core.info(log);
                 });
                 core.info(result);
+                yield core.markdownSummary.addRaw(result).write();
             }
         }
         catch (error) {

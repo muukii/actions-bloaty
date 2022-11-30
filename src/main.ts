@@ -32,6 +32,7 @@ async function run(): Promise<void> {
       )
 
       core.info(result)
+      await core.markdownSummary.addRaw(result).write()
     }
 
     if (derivedDataPath) {
@@ -49,6 +50,8 @@ async function run(): Promise<void> {
       )
 
       core.info(result)
+
+      await core.markdownSummary.addRaw(result).write()
     }
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
