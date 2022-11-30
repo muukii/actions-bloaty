@@ -131,20 +131,14 @@ export default async (
       {
         const patterns = [path.join(mode.derivedDataPath, '**/*.app')]
 
-        info(`${process.cwd()}`)
-
         const globber = await glob.create(patterns.join('\n'), {
           implicitDescendants: false
         })
 
-        info(
-          `Find apps binary: ${globber.getSearchPaths()}, pattern: ${path.join(
-            mode.derivedDataPath,
-            '**/*.app'
-          )}`
-        )
-
         const files = await globber.glob()
+
+        info(`Files ${files}`)
+
         files.forEach(file => {
           const dSYMDirPath = file + '.dSYM'
           if (fs.existsSync(dSYMDirPath)) {

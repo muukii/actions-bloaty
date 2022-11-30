@@ -126,12 +126,11 @@ exports["default"] = (bloatyPath, mode, filter, externalArguments = '', info) =>
             const apps = [];
             {
                 const patterns = [path_1.default.join(mode.derivedDataPath, '**/*.app')];
-                info(`${process.cwd()}`);
                 const globber = yield glob.create(patterns.join('\n'), {
                     implicitDescendants: false
                 });
-                info(`Find apps binary: ${globber.getSearchPaths()}, pattern: ${path_1.default.join(mode.derivedDataPath, '**/*.app')}`);
                 const files = yield globber.glob();
+                info(`Files ${files}`);
                 files.forEach(file => {
                     const dSYMDirPath = file + '.dSYM';
                     if (fs_1.default.existsSync(dSYMDirPath)) {
