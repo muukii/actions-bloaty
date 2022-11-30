@@ -5,7 +5,7 @@ import path from 'path'
 
   process.chdir('/Users/muukii/.ghq/github.com/muukii/play-bloaty-action')
 
-  const patterns = [path.join('DerivedData', '**/*.app')]
+  const patterns = [path.join('./DerivedData', '**/*.app')]
 
   const globber = await glob.create(patterns.join('\n'), {
     implicitDescendants: false

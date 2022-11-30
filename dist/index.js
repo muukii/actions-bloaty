@@ -74,7 +74,7 @@ const renderMarkdown = (modules, externalArguments) => __awaiter(void 0, void 0,
     let result = '';
     for (const module of modules) {
         const command = module.makeCommand(externalArguments);
-        const stdout = yield exec.exec(command).toString();
+        const { stdout } = yield exec.getExecOutput(command);
         result += `
 ## ${module.name()}
 

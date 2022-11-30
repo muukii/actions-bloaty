@@ -48,7 +48,7 @@ const renderMarkdown = async (
 
   for (const module of modules) {
     const command = module.makeCommand(externalArguments)
-    const stdout = await exec.exec(command).toString()
+    const {stdout} = await exec.getExecOutput(command)
 
     result += `
 ## ${module.name()}
