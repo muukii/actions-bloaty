@@ -129,13 +129,13 @@ export default async (
 
       const apps: ReturnType<typeof createModule>[] = []
       {
-        const patterns = [
-          '**',
-          '**/*.app',
-          path.join(mode.derivedDataPath, '**/*.app')
-        ]
+        const patterns = [path.join(mode.derivedDataPath, '**/*.app')]
 
-        const globber = await glob.create(patterns.join('\n'), {})
+        info(`${process.cwd()}`)
+
+        const globber = await glob.create(patterns.join('\n'), {
+          implicitDescendants: false
+        })
 
         info(
           `Find apps binary: ${globber.getSearchPaths()}, pattern: ${path.join(
