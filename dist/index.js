@@ -98,7 +98,7 @@ ${stdout}
 const stripBitcode = (path) => __awaiter(void 0, void 0, void 0, function* () {
     const newPath = `${path}-stripped`;
     yield exec.exec(`cp -r ${path} ${newPath}`);
-    yield exec.exec(`cd ${newPath}; find . -type f -perm +111 -print | xargs -I {} sh -c 'xcrun bitcode_strip -r {} -o {}'`);
+    yield exec.exec(`cd ${newPath} && find . -type f -perm +111 -print | xargs -I {} sh -c 'xcrun bitcode_strip -r {} -o {}'`);
     return newPath;
 });
 exports["default"] = (bloatyPath, mode, filter, externalArguments = '', info) => __awaiter(void 0, void 0, void 0, function* () {
@@ -125,16 +125,20 @@ exports["default"] = (bloatyPath, mode, filter, externalArguments = '', info) =>
             }
             const apps = [];
             {
-                const patterns = [path_1.default.join(mode.derivedDataPath, '**/*.app')];
+                const patterns = [
+                    path_1.default.join(mode.derivedDataPath, '**/Products/**/*.app')
+                ];
                 const globber = yield glob.create(patterns.join('\n'), {
-                    implicitDescendants: false
+                    implicitDescendants: false,
+                    followSymbolicLinks: false
                 });
                 const files = yield globber.glob();
                 info(`Files ${files}`);
                 files.forEach(file => {
                     const dSYMDirPath = file + '.dSYM';
+                    info(`Fetch dSYM: ${dSYMDirPath}`);
                     if (fs_1.default.existsSync(dSYMDirPath)) {
-                        modules.push(createModule({
+                        apps.push(createModule({
                             bloatyPath: bloatyPath,
                             modulePath: file,
                             dSYMPath: dSYMDirPath
@@ -145,7 +149,6 @@ exports["default"] = (bloatyPath, mode, filter, externalArguments = '', info) =>
                     }
                 });
             }
-            info(`modules: ${modules.length}, apps: ${apps.length}`);
             const regex = new RegExp(filter !== null && filter !== void 0 ? filter : '.*');
             return yield renderMarkdown(apps.concat(modules).filter(e => {
                 return regex.test(e.name());
@@ -161,7 +164,10 @@ exports["default"] = (bloatyPath, mode, filter, externalArguments = '', info) =>
                 dSYMPath: path_1.default.join(strippedPath, 'dSYMs', app + '.dSYM')
             });
             const modules = [];
-            const globber = yield glob.create(path_1.default.join(strippedPath, 'Products/Applications', app, '/Frameworks/*.framework'), {});
+            const globber = yield glob.create(path_1.default.join(strippedPath, 'Products/Applications', app, '/Frameworks/*.framework'), {
+                implicitDescendants: false,
+                followSymbolicLinks: false
+            });
             const files = yield globber.glob();
             files.forEach(file => {
                 const frameworkName = path_1.default.basename(file);
@@ -181,7 +187,6 @@ exports["default"] = (bloatyPath, mode, filter, externalArguments = '', info) =>
             const targets = [appModule].concat(modules).filter(e => {
                 return regex.test(e.name());
             });
-            // console.log(targets.map((e) => e.name()));
             return yield renderMarkdown(targets, externalArguments);
         }
     }
@@ -247,7 +252,7 @@ function run() {
                 const result = yield (0, bloaty_1.default)(bloatyPath, {
                     type: 'xcarchive',
                     xcarchivePath: xcarchivePath
-                }, undefined, undefined, log => {
+                }, undefined, '-n 100', log => {
                     core.info(log);
                 });
                 core.info(result);
@@ -257,7 +262,7 @@ function run() {
                 const result = yield (0, bloaty_1.default)(bloatyPath, {
                     type: 'derivedData',
                     derivedDataPath: derivedDataPath
-                }, undefined, undefined, log => {
+                }, undefined, '-n 100', log => {
                     core.info(log);
                 });
                 core.info(result);

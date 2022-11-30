@@ -77,7 +77,7 @@ const stripBitcode = async (path: string) => {
 
   await exec.exec(`cp -r ${path} ${newPath}`)
   await exec.exec(
-    `cd ${newPath}; find . -type f -perm +111 -print | xargs -I {} sh -c 'xcrun bitcode_strip -r {} -o {}'`
+    `cd ${newPath} && find . -type f -perm +111 -print | xargs -I {} sh -c 'xcrun bitcode_strip -r {} -o {}'`
   )
 
   return newPath
@@ -129,10 +129,13 @@ export default async (
 
       const apps: ReturnType<typeof createModule>[] = []
       {
-        const patterns = [path.join(mode.derivedDataPath, '**/*.app')]
+        const patterns = [
+          path.join(mode.derivedDataPath, '**/Products/**/*.app')
+        ]
 
         const globber = await glob.create(patterns.join('\n'), {
-          implicitDescendants: false
+          implicitDescendants: false,
+          followSymbolicLinks: false
         })
 
         const files = await globber.glob()
@@ -141,8 +144,9 @@ export default async (
 
         files.forEach(file => {
           const dSYMDirPath = file + '.dSYM'
+          info(`Fetch dSYM: ${dSYMDirPath}`)
           if (fs.existsSync(dSYMDirPath)) {
-            modules.push(
+            apps.push(
               createModule({
                 bloatyPath: bloatyPath,
                 modulePath: file,
@@ -154,8 +158,6 @@ export default async (
           }
         })
       }
-
-      info(`modules: ${modules.length}, apps: ${apps.length}`)
 
       const regex = new RegExp(filter ?? '.*')
 
@@ -190,7 +192,10 @@ export default async (
           app,
           '/Frameworks/*.framework'
         ),
-        {}
+        {
+          implicitDescendants: false,
+          followSymbolicLinks: false
+        }
       )
       const files = await globber.glob()
 
@@ -219,8 +224,6 @@ export default async (
       const targets = [appModule].concat(modules).filter(e => {
         return regex.test(e.name())
       })
-
-      // console.log(targets.map((e) => e.name()));
 
       return await renderMarkdown(targets, externalArguments)
     }

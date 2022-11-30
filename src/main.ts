@@ -25,7 +25,7 @@ async function run(): Promise<void> {
           xcarchivePath: xcarchivePath
         },
         undefined,
-        undefined,
+        '-n 100',
         log => {
           core.info(log)
         }
@@ -43,7 +43,7 @@ async function run(): Promise<void> {
           derivedDataPath: derivedDataPath
         },
         undefined,
-        undefined,
+        '-n 100',
         log => {
           core.info(log)
         }
